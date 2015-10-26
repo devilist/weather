@@ -2,9 +2,7 @@ package com.weather.app.db;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.weather.app.model.City;
-import com.weather.app.model.County;
-import com.weather.app.model.Province;
+import com.weather.app.model.CityInformation;
 
 import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
@@ -34,54 +32,24 @@ public class WeatherDB {
     }
 
     /**
-     * province 实例存储到数据库
+     * 存储城市信息
+     * @param cityInformation city's information
      */
-    public void saveProvince(Province province){
-        if (province != null) {
-            province.save();
+    public void saveCityInformation(CityInformation cityInformation) {
+
+        if (cityInformation != null) {
+            cityInformation.save();
         }
     }
 
     /**
-     * 从数据库读取全国省份
+     * 从数据库读取全国城市信息
+     * @return List<CityInformation>
      */
-    public List<Province> loadProvinces() {
-        List<Province> provinceList = DataSupport.findAll(Province.class);
-        return provinceList;
-    }
+    public List<CityInformation> loadCityInformation(){
 
-    /**
-     * city实例存储到数据库
-     */
-    public void saveCity(City city){
-        if (city != null) {
-            city.save();
-        }
-    }
-
-    /**
-     * 从数据库读取城市信息
-     */
-    public List<City> loadCities() {
-        List<City> cityList = DataSupport.findAll(City.class);
-        return cityList;
-    }
-
-    /**
-     * county实例存储到数据库
-     */
-    public void saveCounty(County county){
-        if (county != null) {
-            county.save();
-        }
-    }
-
-    /**
-     * 从数据库读取县镇信息
-     */
-    public List<County> loadCounties() {
-        List<County> countyList = DataSupport.findAll(County.class);
-        return countyList;
+        List<CityInformation> cityInformationsList =DataSupport.findAll(CityInformation.class);
+        return cityInformationsList;
     }
 
     /**
@@ -92,13 +60,4 @@ public class WeatherDB {
             db.close();
         }
     }
-
-
-
-
-
-
-
-
-
 }
