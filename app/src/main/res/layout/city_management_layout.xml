@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/city_management"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/white0">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/city_management_Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:elevation="10dp"
+        android:typeface="serif"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@+id/city_management_listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="0.25dp"
+        android:typeface="serif"
+        android:layout_below="@id/city_management_Toolbar"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        />
+
+    <Button
+        android:id="@+id/add_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:typeface="serif"
+        android:textSize="42sp"
+        android:includeFontPadding="false"
+        android:background="#00494949"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

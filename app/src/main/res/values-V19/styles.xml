@@ -1,0 +1,60 @@
+<resources>
+
+    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="@style/BaseAppTheme">
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#66616161</item>
+        <!-- 状态栏颜色 -->
+        <item name="colorPrimaryDark">#1976D2</item>
+        <item name="android:statusBarColor">#1976D2</item>
+        <!-- 窗口的背景颜色 -->
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:textColorPrimary">#212121</item>
+        <item name="android:textColorSecondary">#727272</item>
+        <item name="android:divider">#B6B6B6</item>
+
+        <item name="android:typeface">serif</item>
+
+    </style>
+
+
+    <style name="WeatherActivityTheme" parent="@style/AppTheme">
+        <item name="windowActionBarOverlay">true</item>
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+
+    </style>
+
+    <style name="MyDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@color/dialog_bg_color</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:positiveButtonText">#564873</item>
+    </style>
+
+    <style name="MyProgressDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@color/dialog_bg_color</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textSize">16sp</item>
+
+    </style>
+
+    <style name="ToolbarStyle" parent="">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <!--<item name="android:theme">@style/ThemeOverlay.AppCompat.ActionBar</item>-->
+        <item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
+    </style>
+
+    <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:src">@mipmap/ic_overflow6</item>
+
+    </style>
+
+</resources>

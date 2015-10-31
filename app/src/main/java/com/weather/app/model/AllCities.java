@@ -50,9 +50,12 @@ public class AllCities {
          */
 
         private int areaid;
+
         private String prov;
         private String city;
         private String district;
+
+        private boolean isSelected = false;
 
         public void setAreaid(int areaid) {
             this.areaid = areaid;
@@ -85,6 +88,15 @@ public class AllCities {
         public String getDistrict() {
             return district;
         }
+
+        public boolean isSelected() {
+            return isSelected;
+        }
+
+        public void setIsSelected(boolean isSelected) {
+            this.isSelected = isSelected;
+        }
+
     }
 
 }

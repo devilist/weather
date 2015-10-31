@@ -1,14 +1,38 @@
 <resources>
 
+    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">#4876FF</item>
+    <style name="AppTheme" parent="@style/BaseAppTheme">
+
+
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        !-- Customize your theme here. -->
+        <item name="colorPrimary">#616161</item>
         <!-- 状态栏颜色 -->
-        <item name="colorPrimaryDark">#3A5FCD</item>
+        <item name="colorPrimaryDark">#1976D2</item>
         <!-- 窗口的背景颜色 -->
         <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:typeface">serif</item>
 
+
+    </style>
+
+    <style name="WeatherActivityTheme" parent="@style/AppTheme">
+        <item name="windowActionBarOverlay">true</item>
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+
+    </style>
+
+    <style name="MyDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@color/dialog_bg_color</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:positiveButtonText">#564873</item>
     </style>
 
 </resources>

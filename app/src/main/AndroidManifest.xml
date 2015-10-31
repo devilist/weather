@@ -1,7 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.weather.app">
+          package="com.weather.app"
+    >
+    <!--android:installLocation="preferExternal"-->
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
+
 
     <application
         android:name="com.weather.app.util.MyApplication"
@@ -11,8 +15,11 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.weather.app.activity.SearchCityActivity"
+            android:name="com.weather.app.activity.SelectedCityWeatherActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:allowTaskReparenting="true"
+            android:theme="@style/WeatherActivityTheme"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +28,25 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.weather.app.activity.SearchCityActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.CityManagementActivity" />
+
+        </activity>
+        <activity
+            android:name="com.weather.app.activity.CityManagementActivity"
+            android:launchMode="singleTop"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.SelectedCityWeatherActivity" />
+        </activity>
+        <activity android:name=".activity.BaseActivity"/>
+        <service android:name=".service.InitCityService">
+
+        </service>
     </application>
 
 </manifest>

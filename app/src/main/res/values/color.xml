@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="grid_item_pressed_color">#E0E0E0</color>
+    <color name="WeatherActivityTheme_bg_color">#eeeeee</color>
+    <color name="chart_bar_color">#33fbfbfb</color>
+    <color name="chart_line_color1">#77fbfbfb</color>
+    <color name="hight_temp_area_color1">#22fbfbfb</color>
+    <color name="low_temp_area_color1">#22ffccbc</color>
+    <color name="chart_bg_color1">#fbfbfb</color>
+    <color name="weather_info_layout_text_color1">#77fbfbfb</color>
+    <color name="weather_image_icon_tint_color">#000000</color>
+    <color name="dialog_bg_color">#fbfbfb</color>
+
+    <color name="weatherView1_bg_color1">#33795548</color>
+    <color name="weatherView2_bg_color1">#22785643</color>
+    <color name="weatherView3_bg_color">#11785643</color>
+    <color name="hourlyforecast_chart_bg_color1">#785643</color>
+    <color name="dailyforecast_chart_bg_color1">#11785643</color>
+    <color name="hourlyforecast_tip_bg_color1">#05785643</color>
+    <color name="dialyforecast_tip_bg_color1">#11785643</color>
+    <color name="suggestion_tip_bg_color1">#11785643</color>
+
+
+    <color name="weather_toolbar_bg_color">#55000000</color>
+
+
+    <color name="city_management_swipeMenuItem_bg_color">#00000000</color>
+
+
+    <color name="city_name_color">#77636363</color>
+
+
+    <color name="color_bg">#f7f7f7</color>
+    <color name="color_bg1">#949494</color>
+
+    <!--方案2配色-->
+    <color name="weather_info_layout_text_color">#616161</color>
+    <color name="weatherView2_bg_color">#ededed</color>
+    <color name="hourlyforecast_chart_bg_color">@android:color/transparent</color>
+
+    <color name="dailyforecast_chart_bg_color">@android:color/transparent</color>
+
+    <color name="column_color">#785643</color>
+
+    <color name="chart_line_color">#3b3b3b</color>
+    <color name="chart_bg_color">#ededed</color>
+    <color name="hight_temp_area_color">#949494</color>
+    <color name="low_temp_area_color">#3b3b3b</color>
+
+
+
+
+
+</resources>

@@ -22,7 +22,12 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.+'
+    compile 'com.android.support:cardview-v7:22.+'
+    compile 'com.android.support:support-v4:23.0.1'
     compile files('libs/gson-2.3.1.jar')
     compile files('libs/litepal-1.2.1.jar')
     compile files('libs/volley.jar')
+    compile files('libs/achartengine-1.1.0.jar')
+    compile 'com.baoyz.swipemenulistview:library:1.3.0'
+    compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
 }

@@ -1,34 +1,323 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<com.weather.app.view.MultiDrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+    >
 
-    <ScrollView
+    <!--child(0) 湿度 能见度-->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="false"
-        android:id="@+id/weather">
-
-        <LinearLayout
+        android:layout_height="match_parent"
+        android:background="@drawable/white045"
+        >
+        <com.weather.app.view.MyGridView
+            android:id="@+id/hum_vis_gridview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_centerInParent="true"
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="1dp"
+            android:horizontalSpacing="1dp"
+            >
+        </com.weather.app.view.MyGridView>
+
+    </RelativeLayout>
+
+    <!--child(1) downdrawer; 24小时天气-->
+    <LinearLayout
+        android:id="@+id/weather_info_view_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="1dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp"
+        android:orientation="vertical"
+        android:elevation="15dp"
+        android:background="@drawable/white045"
+        >
+
+        <TextView
+            android:id="@+id/hourly_forecast_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="12小时天气"
+            android:textSize="10sp"
+            android:typeface="serif"
+            android:includeFontPadding="false"
+            android:textColor="@color/weather_info_layout_text_color"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="5dp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/hourlyforecast_chart_view_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            >
+
+        </RelativeLayout>
+
+        <GridView
+            android:id="@+id/hourly_forecast_gridview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:numColumns="7"
+            android:stretchMode="columnWidth"
+            android:paddingTop="5dp"
+            android:visibility="gone"
+            >
+
+        </GridView>
+
+    </LinearLayout>
+
+    <!--child(2),生活指数-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white045"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/suggestion_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:gravity="right"
+            android:text="生活指数"
+            android:textSize="10sp"
+            android:typeface="serif"
+            android:includeFontPadding="false"
+            android:textColor="@color/weather_info_layout_text_color"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="5dp"
+            />
+
+        <com.weather.app.view.MyGridView
+            android:id="@+id/suggestion_gridview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="1dp"
+            android:horizontalSpacing="1dp"
+            android:layout_marginTop="1dp"
+            >
+        </com.weather.app.view.MyGridView>
+
+    </LinearLayout>
+
+    <!--child(3),updrawer,未来五天预报-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white045"
+        android:elevation="15dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/forecast_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:gravity="right"
+            android:text="未来天气"
+            android:textSize="10sp"
+            android:typeface="serif"
+            android:includeFontPadding="false"
+            android:textColor="@color/weather_info_layout_text_color"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/dailyforecast_chart_view_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2.4"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            >
+        </RelativeLayout>
+
+        <GridView
+            android:id="@+id/forecast_gridview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:numColumns="5"
+            android:stretchMode="columnWidth"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            >
+        </GridView>
+    </LinearLayout>
+
+    <!--child(4) 基本天气状况-->
+    <LinearLayout
+        android:id="@+id/base_weather_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="30dp"
+        android:orientation="vertical"
+        android:background="@drawable/black0"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.55">
 
             <TextView
-                android:id="@+id/temp_now"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="#aabbcc"/>
+                android:id="@+id/temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:includeFontPadding="false"
+                android:layout_marginLeft="30dp"
+                android:scaleY="1.0"
+                android:typeface="serif"
+                android:textSize="130sp"
+                android:textColor="@color/weather_info_layout_text_color"
+                />
+
             <TextView
-                android:id="@+id/weather_condition"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="#ffddcc"/>
+                android:id="@+id/temp_symbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/temp"
+                android:layout_toRightOf="@id/temp"
+                android:includeFontPadding="false"
+                android:layout_marginLeft="15dp"
+                android:textColor="@color/weather_info_layout_text_color"
+                android:textSize="45sp"
+                />
 
-        </LinearLayout>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                >
+
+                <ImageView
+                    android:id="@+id/my_image"
+                    android:layout_width="70dp"
+                    android:layout_height="100dp"
+                    android:tint="@color/weather_info_layout_text_color"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:paddingBottom="30dp"
+                    />
+                
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.45"
+            >
+
+            <TextView
+                android:id="@+id/city_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:includeFontPadding="false"
+                android:typeface="serif"
+                android:textSize="45sp"
+                android:layout_marginLeft="0dp"
+                android:textColor="@color/weather_info_layout_text_color"
+                />
+            
+            <TextView
+                android:id="@+id/current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/city_name"
+                android:layout_centerHorizontal="true"
+                android:includeFontPadding="false"
+                android:textColor="@color/weather_info_layout_text_color"
+                android:textSize="20sp"
+                />
+
+            <ImageView
+                android:id="@+id/position"
+                android:layout_width="wrap_content"
+                android:layout_height="17dp"
+                android:layout_alignBottom="@id/city_name"
+                android:layout_toLeftOf="@id/city_name"
+                android:src="@drawable/position"
+                android:visibility="gone"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="-20dp"
+                android:tint="@color/weather_info_layout_text_color"
+                />
+
+            <TextView
+                android:id="@+id/condition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/week_day"
+                android:layout_alignParentRight="true"
+                android:includeFontPadding="false"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="-5dp"
+                android:typeface="serif"
+                android:textSize="13sp"
+                android:textColor="@color/weather_info_layout_text_color"
+                />
+
+            <TextView
+                android:id="@+id/week_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/update_time"
+                android:layout_alignParentRight="true"
+                android:includeFontPadding="false"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="-3dp"
+                android:textColor="@color/weather_info_layout_text_color"
+                android:textSize="12sp"
+                />
+
+            <TextView
+                android:id="@+id/update_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="2dp"
+                android:includeFontPadding="false"
+                android:textColor="@color/weather_info_layout_text_color"
+                android:textSize="10sp"/>
+
+        </RelativeLayout>
 
 
-    </ScrollView>
 
-</LinearLayout>
+
+    </LinearLayout>
+
+</com.weather.app.view.MultiDrawerLayout>

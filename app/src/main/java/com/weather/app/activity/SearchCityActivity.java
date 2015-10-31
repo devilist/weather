@@ -1,13 +1,24 @@
 package com.weather.app.activity;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,14 +29,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 import com.weather.app.R;
 import com.weather.app.db.WeatherDB;
+import com.weather.app.model.AllCities;
 import com.weather.app.model.CityInformation;
+import com.weather.app.model.JsonResponse;
+import com.weather.app.model.MyCityInformations;
 import com.weather.app.util.LogUtil;
 import com.weather.app.util.MyApplication;
-import com.weather.app.util.Utility;
+import com.weather.app.view.QuickSearchViewAdapter;
 
 import org.apache.http.protocol.HTTP;
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +51,31 @@ import java.util.List;
  * <p>Created by zengpu on 15/10/24.
  * @author ZengPu
  */
-public class SearchCityActivity extends AppCompatActivity {
+public class SearchCityActivity extends BaseActivity {
 
     private  final static String TAG = "SearchCityActivity";
 
-    private TextView mTextView;
+    /**
+     * 城市搜索页面的toolBar. 用toolBar代替ActionBar;toolBar有更好的扩展性
+     */
+    private Toolbar mToolbar;
 
     /**
-     * 没有搜索结果时,显示 『无匹配城市』
+     * toolBar 上用来搜索的SearchView
      */
-    private TextView  noSearchResult;
+    private SearchView mSearchView;
+
+    /**
+     * 快速搜索界面
+     */
+    private GridView quickSearchGridView;
+
+    /**
+     * 快速搜索界面的Adapter
+     */
+    private ArrayAdapter<String> quickSearchViewAdapter;
+
+    private  String[] quickSearchList;
 
     /**
      * 用以显示城市搜索结果的ListView
@@ -62,42 +93,107 @@ public class SearchCityActivity extends AppCompatActivity {
     private ArrayList<String> searchList = new ArrayList<>();
 
     /**
-     * 城市搜索页面的toolBar. 用toolBar代替ActionBar;toolBar有更好的扩展性
+     * 没有搜索结果时,显示 『无匹配城市』
      */
-    private Toolbar mToolbar;
+    private TextView  noSearchResult;
 
-    /**
-     * toolBar 上用来搜索的SearchView
-     */
-    private SearchView mSearchView;
+    private TextView quickAdd;
 
     private WeatherDB weatherDB;
     /**
      * 所有城市列表
      */
-    private List<CityInformation>  cityInformations;
+    private List<CityInformation>  cityInformations = new ArrayList<>();
+
+    /**
+     * 我的城市
+     */
+    private List<String> mCitiesList = new ArrayList<>();
+
+
+    private JsonResponse j;
+
+    private MyCityInformations myCityInformations;
 
     private final static  String  MY_KEY= "4f08b54689454ae9bf61905c5a032cb4";
+
+    private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_city_layout);
         weatherDB = WeatherDB.getInstance();
-        initCities();
+        j= JsonResponse.getInstance();
 
-        mTextView = (TextView) findViewById(R.id.mTextView);
-        noSearchResult = (TextView) findViewById(R.id.no_search_result);
+        new InitCityInformationsTask().execute();
 
-        cityListView =(ListView) findViewById(R.id.city_listView);
-        cityListView.setVerticalScrollBarEnabled(false);
-        cityListViewAdapter = new ArrayAdapter<>(SearchCityActivity.this,
-                android.R.layout.simple_list_item_1,searchList);
-        cityListView.setAdapter(cityListViewAdapter);
+        LogUtil.d(TAG, "leng is " + j.getS1().length());
 
         mToolbar = (Toolbar) findViewById(R.id.mToolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        quickAdd = (TextView) findViewById(R.id.quick_add);
+        noSearchResult = (TextView) findViewById(R.id.no_search_result);
+
+        quickSearchGridView = (GridView) findViewById(R.id.quick_search_gridView);
+
+        Intent intent = getIntent();
+        mCitiesList = intent.getStringArrayListExtra("mcities");
+        quickSearchList =new String[]{
+                "定位","北京","上海","广州","深圳","珠海","佛山","南京","苏州",
+                "杭州","济南","青岛","郑州","石家庄","福州","厦门","武汉","长沙",
+                "成都","重庆","太原","沈阳","南宁","西安"
+        };
+//        quickSearchViewAdapter =new ArrayAdapter<String>(SearchCityActivity.this,
+//                R.layout.quick_search_item,quickSearchList);
+        quickSearchViewAdapter = new QuickSearchViewAdapter(SearchCityActivity.this,
+                R.layout.quick_search_item,quickSearchList, mCitiesList);
+        quickSearchGridView.setVerticalScrollBarEnabled(false);
+        quickSearchGridView.setAdapter(quickSearchViewAdapter);
+        quickSearchGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                TextView cityName = (TextView) view.findViewById(R.id.item_city_name);
+                List<CityInformation> findCity = DataSupport.where("district = ?",
+                                                                cityName.getText().toString())
+                                                                .find(CityInformation.class);
+                //如果该城市已被选择,不触发点击
+                if (!findCity.get(0).isSelectedTag()) {
+                    mSearchView.setQuery((cityName).getText().toString(), false);
+                }
+            }
+        });
+
+        cityListView =(ListView) findViewById(R.id.city_listView);
+        cityListView.setVerticalScrollBarEnabled(false);
+        cityListViewAdapter = new ArrayAdapter<>(SearchCityActivity.this,
+                R.layout.search_result_item,searchList);
+        cityListView.setAdapter(cityListViewAdapter);
+        cityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String[] s = searchList.get(position).split(" ");
+                String cityName = s[0];
+                LogUtil.i("TAG","cityName is"+ cityName +";");
+                List<CityInformation> city = DataSupport.where("district = ?",cityName)
+                                                        .find(CityInformation.class);
+                weatherDB.markSelectedCity(city.get(0));
+                SelectedCityWeatherActivity.actionStart(SearchCityActivity.this , -1);
+                finish();
+            }
+        });
+
+
+    }
+
+    public static void actionStart(Context context,ArrayList<String> mcityList){
+        Intent intent = new Intent(context,SearchCityActivity.class);
+        intent.putStringArrayListExtra("mcities", mcityList);
+        context.startActivity(intent);
     }
 
     @Override
@@ -112,16 +208,19 @@ public class SearchCityActivity extends AppCompatActivity {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return true;
+                return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
 
                 if (!TextUtils.isEmpty(newText)) {
-                    mTextView.setVisibility(View.GONE);
+                    quickSearchGridView.setVisibility(View.GONE);
+                    quickAdd.setVisibility(View.GONE);
                     noSearchResult.setVisibility(View.GONE);
                     searchList.clear();
-                    if (newText.length()>1) {
+                    LogUtil.i("TAG", "cityimformations size is: " + cityInformations.size());
+                    if (newText.length() > 1) {
                         for (int i = 0; i < cityInformations.size(); i++) {
                             String c = cityInformations.get(i).toString();
                             int index = c.indexOf(newText);
@@ -129,7 +228,7 @@ public class SearchCityActivity extends AppCompatActivity {
                                 searchList.add(c);
                             }
                         }
-                        if (searchList.size()==0) {
+                        if (searchList.size() == 0) {
                             noSearchResult.setVisibility(View.VISIBLE);
                             cityListView.setVisibility(View.GONE);
 
@@ -143,7 +242,8 @@ public class SearchCityActivity extends AppCompatActivity {
                         cityListView.setVisibility(View.GONE);
                     }
                 } else {
-                    mTextView.setVisibility(View.VISIBLE);
+                    quickSearchGridView.setVisibility(View.VISIBLE);
+                    quickAdd.setVisibility(View.VISIBLE);
                     cityListView.setVisibility(View.GONE);
                     noSearchResult.setVisibility(View.GONE);
                     searchList.clear();
@@ -154,14 +254,19 @@ public class SearchCityActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /**
-     * 从数据库加载全国城市信息
-     */
-    private void initCities() {
-        cityInformations = weatherDB.loadCityInformation();
-        if (cityInformations.size() <= 0) {
-            queryFromServer();
+    @Override
+    public void onBackPressed() {
+
+        if (mSearchView.getQuery().length()>0){
+            mSearchView.setQuery("", false);
+            mSearchView.clearFocus();
+        } else{
+//            mSearchView.clearFocus();
+            super.onBackPressed();
+            closeProgressDialog();
+            finish();
         }
+
     }
 
     /**
@@ -172,21 +277,23 @@ public class SearchCityActivity extends AppCompatActivity {
         RequestQueue mQueue = Volley.newRequestQueue(MyApplication.getContext());
         StringRequest stringRequest = new StringRequest(address,
                 new Response.Listener<String>() {
+
                     @Override
                     public void onResponse(String response) {
+
                         LogUtil.i(TAG, "--------> " + response);
-                        boolean result = false;
-                        result = Utility.handleCityInfoResponse(weatherDB,response);
-                        if (result) {
-                            // 通过runonUiMainThread方法返回主线程处理逻辑
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-//                                    closeProgressDialog();
-                                    initCities();
-                                }
-                            });
-                        }
+//                        boolean result = false;
+//                        result = Utility.handleCityInfoResponse(weatherDB,response);
+//                        if (result) {
+//                            // 通过runonUiMainThread方法返回主线程处理逻辑
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+////                                    closeProgressDialog();
+////                                    initCities();
+//                                }
+//                            });
+//                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -224,9 +331,166 @@ public class SearchCityActivity extends AppCompatActivity {
         mQueue.add(stringRequest);
     }
 
+
+    /**
+     * 显示进度对话框
+     */
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+//            progressDialog = new ProgressDialog(this,R.style.MyProgressDialog);
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//            progressDialog.setTitle("天气云");
+            progressDialog.setMessage("初始化......");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setCancelable(false);
+            progressDialog.getWindow().setGravity(Gravity.CENTER);
+
+            Window window = progressDialog.getWindow();
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.alpha = 0.6f;
+            lp.dimAmount = 0.1f;
+        }
+        progressDialog.show();
+    }
+
+    /**
+     * 关闭进度对话框
+     */
+    private void closeProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                    TaskStackBuilder.create(this)
+                            .addNextIntentWithParentStack(upIntent)
+                            .startActivities();
+                    finish();
+                } else {
+                    upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    NavUtils.navigateUpTo(this, upIntent);
+                }
+                return true;
+        }
+        return false;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        closeProgressDialog();
         weatherDB.destroyDB();
+
+    }
+
+    /**
+     *
+     */
+    private class InitCityInformationsTask extends AsyncTask<Void,Integer,Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            while (true) {
+                int progress = initCities();
+//                publishProgress(progress);
+                if (progress >= 2567) {
+                    break;
+                }
+                return true;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+//            progressDialog.setMessage("初始化......" + values[0] * 100 / 2590 + "%");
+            progressDialog.setProgress(values[0] * 100 / 2590);
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
+        }
+
+        /**
+         * 从数据库加载全国城市信息
+         */
+        private int initCities() {
+            int progress;
+            myCityInformations = MyCityInformations.getInstance();
+            cityInformations = myCityInformations.getCityInformations();
+            LogUtil.i("TAG","cityinformations size is: " + cityInformations.size());
+//            cityInformations = weatherDB.loadCityInformation();
+            if ((cityInformations.size() < 2567)) {
+                String response = j.getS1() + j.getS2() + j.getS3() +
+                        j.getS4() + j.getS5() + j.getS6() + j.getS7() + j.getS8();
+                response.replaceAll("\n", "");
+                progress = queryFromDB(response);
+            } else {
+                progress = cityInformations.size();
+            }
+            return progress;
+        }
+
+        /**
+         * 解析jsonresponse
+         * @param response
+         */
+        private int queryFromDB( String response){
+//            boolean result = false;
+            int progress = 0;
+//            progress = Utility.handleCityInfoResponse(weatherDB, response);
+
+            if (!TextUtils.isEmpty(response)) {
+                Gson gson = new Gson();
+                AllCities allCities = gson.fromJson(response, AllCities.class);
+                List<AllCities.CityInfo> cityList = allCities.getData();
+                if (cityList != null && cityList.size() > 0) {
+                    for (AllCities.CityInfo c : cityList) {
+                        CityInformation cityInformation = new CityInformation();
+                        cityInformation.setAreaid(c.getAreaid());
+                        cityInformation.setDistrict(c.getDistrict());
+                        cityInformation.setCity(c.getCity());
+                        cityInformation.setProv(c.getProv());
+                        LogUtil.i(TAG, "cityinfo is " + cityInformation.toString());
+
+                        weatherDB.saveCityInformation(cityInformation);
+                        progress++;
+                        publishProgress(progress);
+                    }
+                }
+            }
+
+            if (progress == 2567) {
+                myCityInformations.setCityInformations(weatherDB.loadCityInformation());
+                initCities();
+            }
+
+            return progress;
+        }
+
+
+
     }
 }

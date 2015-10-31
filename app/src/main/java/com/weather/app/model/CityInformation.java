@@ -19,6 +19,25 @@ public class CityInformation extends DataSupport{
     private String city;
     private String district;
 
+    private  boolean selectedTag = false;
+    private  int selectedId = -1;
+
+    public int getSelectedId() {
+        return selectedId;
+    }
+
+    public void setSelectedId(int selectedId) {
+        this.selectedId = selectedId;
+    }
+
+    public boolean isSelectedTag() {
+        return selectedTag;
+    }
+
+    public void setSelectedTag(boolean selectedTag) {
+        this.selectedTag = selectedTag;
+    }
+
     public void setAreaid(int areaid) {
         this.areaid = areaid;
     }
@@ -34,6 +53,7 @@ public class CityInformation extends DataSupport{
     public void setDistrict(String district) {
         this.district = district;
     }
+
 
     public int getAreaid() {
         return areaid;
@@ -51,18 +71,19 @@ public class CityInformation extends DataSupport{
         return district;
     }
 
+
     @Override
     public String toString() {
         if (prov.equals("北京")|prov.equals("上海")|prov.equals("天津")|prov.equals("重庆")) {
             if (city.equals(district)) {
                 return district;
             }
-            return district + "-" + prov;
+            return district + " - " + prov;
         }
         if (city.equals(district)) {
-            return district + "-" + prov;
+            return district + " - " + prov;
         }
-            return district + "-" + city + "-" + prov;
+            return district + " - " + city + " - " + prov;
     }
 }
 
