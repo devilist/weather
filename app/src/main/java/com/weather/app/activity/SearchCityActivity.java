@@ -7,7 +7,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import com.android.volley.toolbox.Volley;
 import com.weather.app.R;
 import com.weather.app.db.WeatherDB;
 import com.weather.app.model.CityInformation;
+import com.weather.app.model.JsonResponse;
 import com.weather.app.util.LogUtil;
 import com.weather.app.util.MyApplication;
 import com.weather.app.util.Utility;
@@ -39,12 +42,27 @@ public class SearchCityActivity extends AppCompatActivity {
 
     private  final static String TAG = "SearchCityActivity";
 
-    private TextView mTextView;
+    /**
+     * 城市搜索页面的toolBar. 用toolBar代替ActionBar;toolBar有更好的扩展性
+     */
+    private Toolbar mToolbar;
 
     /**
-     * 没有搜索结果时,显示 『无匹配城市』
+     * toolBar 上用来搜索的SearchView
      */
-    private TextView  noSearchResult;
+    private SearchView mSearchView;
+
+    /**
+     * 快速搜索界面
+     */
+    private GridView quickSearchGridView;
+
+    /**
+     * 快速搜索界面的Adapter
+     */
+    private ArrayAdapter<String> quickSearchViewAdapter;
+
+    private  String[] quickSearchList;
 
     /**
      * 用以显示城市搜索结果的ListView
@@ -62,20 +80,19 @@ public class SearchCityActivity extends AppCompatActivity {
     private ArrayList<String> searchList = new ArrayList<>();
 
     /**
-     * 城市搜索页面的toolBar. 用toolBar代替ActionBar;toolBar有更好的扩展性
+     * 没有搜索结果时,显示 『无匹配城市』
      */
-    private Toolbar mToolbar;
+    private TextView  noSearchResult;
 
-    /**
-     * toolBar 上用来搜索的SearchView
-     */
-    private SearchView mSearchView;
+    private TextView quickAdd;
 
     private WeatherDB weatherDB;
     /**
      * 所有城市列表
      */
     private List<CityInformation>  cityInformations;
+
+    private JsonResponse j;
 
     private final static  String  MY_KEY= "4f08b54689454ae9bf61905c5a032cb4";
 
@@ -84,20 +101,49 @@ public class SearchCityActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_city_layout);
         weatherDB = WeatherDB.getInstance();
+        j= JsonResponse.getInstance();
         initCities();
 
-        mTextView = (TextView) findViewById(R.id.mTextView);
-        noSearchResult = (TextView) findViewById(R.id.no_search_result);
-
-        cityListView =(ListView) findViewById(R.id.city_listView);
-        cityListView.setVerticalScrollBarEnabled(false);
-        cityListViewAdapter = new ArrayAdapter<>(SearchCityActivity.this,
-                android.R.layout.simple_list_item_1,searchList);
-        cityListView.setAdapter(cityListViewAdapter);
+        LogUtil.d(TAG, "leng is " + j.getS1().length());
 
         mToolbar = (Toolbar) findViewById(R.id.mToolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        quickAdd = (TextView) findViewById(R.id.quick_add);
+        noSearchResult = (TextView) findViewById(R.id.no_search_result);
+
+        quickSearchGridView = (GridView) findViewById(R.id.quick_search_gridView);
+        quickSearchList =new String[]{
+                "定位","北京","上海","广州","深圳","珠海","佛山","南京","苏州",
+                "杭州","济南","青岛","郑州","石家庄","福州","厦门","武汉","长沙",
+                "成都","重庆","太原","沈阳","南宁","西安"
+        };
+        quickSearchViewAdapter =new ArrayAdapter<String>(SearchCityActivity.this,
+                R.layout.quick_search_layout,quickSearchList);
+        quickSearchGridView.setVerticalScrollBarEnabled(false);
+        quickSearchGridView.setAdapter(quickSearchViewAdapter);
+//        quickSearchGridView.setSelector(new ColorDrawable(Color.GREEN));
+        quickSearchGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mSearchView.setQuery(((TextView) view).getText().toString(), false);
+            }
+        });
+
+        cityListView =(ListView) findViewById(R.id.city_listView);
+        cityListView.setVerticalScrollBarEnabled(false);
+        cityListViewAdapter = new ArrayAdapter<>(SearchCityActivity.this,
+                R.layout.search_result_layout,searchList);
+        cityListView.setAdapter(cityListViewAdapter);
+        cityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String s = searchList.get(position);
+                Toast.makeText(SearchCityActivity.this,s,Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override
@@ -112,16 +158,18 @@ public class SearchCityActivity extends AppCompatActivity {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return true;
+                return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
 
                 if (!TextUtils.isEmpty(newText)) {
-                    mTextView.setVisibility(View.GONE);
+                    quickSearchGridView.setVisibility(View.GONE);
+                    quickAdd.setVisibility(View.GONE);
                     noSearchResult.setVisibility(View.GONE);
                     searchList.clear();
-                    if (newText.length()>1) {
+                    if (newText.length() > 1) {
                         for (int i = 0; i < cityInformations.size(); i++) {
                             String c = cityInformations.get(i).toString();
                             int index = c.indexOf(newText);
@@ -129,7 +177,7 @@ public class SearchCityActivity extends AppCompatActivity {
                                 searchList.add(c);
                             }
                         }
-                        if (searchList.size()==0) {
+                        if (searchList.size() == 0) {
                             noSearchResult.setVisibility(View.VISIBLE);
                             cityListView.setVisibility(View.GONE);
 
@@ -143,7 +191,8 @@ public class SearchCityActivity extends AppCompatActivity {
                         cityListView.setVisibility(View.GONE);
                     }
                 } else {
-                    mTextView.setVisibility(View.VISIBLE);
+                    quickSearchGridView.setVisibility(View.VISIBLE);
+                    quickAdd.setVisibility(View.VISIBLE);
                     cityListView.setVisibility(View.GONE);
                     noSearchResult.setVisibility(View.GONE);
                     searchList.clear();
@@ -154,14 +203,48 @@ public class SearchCityActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public void onBackPressed() {
+
+        if (mSearchView.getQuery().length()>0){
+            mSearchView.setQuery("", false);
+            mSearchView.clearFocus();
+        } else{
+//            mSearchView.clearFocus();
+            super.onBackPressed();
+        }
+    }
+
     /**
      * 从数据库加载全国城市信息
      */
     private void initCities() {
         cityInformations = weatherDB.loadCityInformation();
         if (cityInformations.size() <= 0) {
-            queryFromServer();
+//            queryFromServer();
+           String response = j.getS1() + j.getS2() + j.getS3() +
+                    j.getS4() + j.getS5() + j.getS6() + j.getS7() + j.getS8();
+            response.replaceAll("\n", "");
+            queryFromDB(response);
         }
+
+    }
+
+    private void queryFromDB( String response){
+
+        boolean result = false;
+        result = Utility.handleCityInfoResponse(weatherDB,response);
+        if (result) {
+            // 通过runonUiMainThread方法返回主线程处理逻辑
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                                    closeProgressDialog();
+            initCities();
+                }
+            });
+        }
+
     }
 
     /**
@@ -172,8 +255,10 @@ public class SearchCityActivity extends AppCompatActivity {
         RequestQueue mQueue = Volley.newRequestQueue(MyApplication.getContext());
         StringRequest stringRequest = new StringRequest(address,
                 new Response.Listener<String>() {
+
                     @Override
                     public void onResponse(String response) {
+
                         LogUtil.i(TAG, "--------> " + response);
                         boolean result = false;
                         result = Utility.handleCityInfoResponse(weatherDB,response);

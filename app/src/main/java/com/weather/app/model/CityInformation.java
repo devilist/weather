@@ -57,12 +57,12 @@ public class CityInformation extends DataSupport{
             if (city.equals(district)) {
                 return district;
             }
-            return district + "-" + prov;
+            return district + " - " + prov;
         }
         if (city.equals(district)) {
-            return district + "-" + prov;
+            return district + " - " + prov;
         }
-            return district + "-" + city + "-" + prov;
+            return district + " - " + city + " - " + prov;
     }
 }
 

@@ -16,24 +16,53 @@
         app:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
 
     <TextView
-        android:id="@+id/mTextView"
+        android:id="@+id/quick_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:text="快速添加"
+        android:typeface="monospace"
+        android:textSize="12sp"
+        android:textColor="#C2C2C2"/>
+
+    <GridView
+        android:id="@+id/quick_search_gridView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#E8E7E7"
-        android:text="测试用的kjjhkvjvjkhbjh"
-        android:gravity="center"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20.5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20.5dp"
+        android:background="#E0E0E0"
+        android:numColumns="3"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:verticalSpacing="0.5dp"
+        android:horizontalSpacing="0.5dp"
+        android:padding="0.25dp"
+        android:listSelector="@drawable/list_selector"/>
+
 
     <ListView
         android:id="@+id/city_listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:visibility="gone"/>
     <TextView
         android:id="@+id/no_search_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:paddingTop="100dp"
         android:text="无匹配城市"
+        android:typeface="monospace"
+        android:textSize="16sp"
+        android:textColor="#5E5E5E"
+        android:visibility="gone"
         android:gravity="center"/>
 
 </LinearLayout>

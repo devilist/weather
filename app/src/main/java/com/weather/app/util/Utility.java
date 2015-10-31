@@ -41,6 +41,7 @@ public class Utility {
                     cityInformation.setCity(c.getCity());
                     cityInformation.setProv(c.getProv());
                     LogUtil.i(TAG, "cityinfo is " + cityInformation.toString());
+
                     weatherDB.saveCityInformation(cityInformation);
                 }
                 return true;
